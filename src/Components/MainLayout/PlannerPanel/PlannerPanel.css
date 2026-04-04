@@ -1,18 +1,24 @@
 .planner-panel {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 2rem;
-  border-left: 1px solid #1e1e1e;
+  gap: 0;
+  padding: 0;
   height: 100%;
   overflow-y: auto;
   box-sizing: border-box;
+  background: linear-gradient(160deg, #f4f8fd 0%, #eef2f7 100%);
+  font-family: 'DM Sans', sans-serif;
 }
+
+.planner-panel::-webkit-scrollbar { width: 4px; }
+.planner-panel::-webkit-scrollbar-track { background: transparent; }
+.planner-panel::-webkit-scrollbar-thumb { background: #c2cede; border-radius: 4px; }
 
 .planner-panel__divider {
   border: none;
-  border-top: 1px solid #1e1e1e;
-  margin: 0;
+  border-top: 1px solid #c2cede;
+  margin: 0 1.75rem;
+  flex-shrink: 0;
 }
 
 .planner-panel__loading {
@@ -20,17 +26,20 @@
   align-items: center;
   gap: 0.6rem;
   font-size: 0.72rem;
-  color: #4a4a4a;
+  color: #7a92a8;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 1.25rem 1.75rem;
 }
 
 .planner-panel__spinner {
-  font-size: 0.6rem;
-  color: #d4a853;
+  font-size: 0.65rem;
+  color: #2e6da4;
   animation: spin 2s linear infinite;
+  display: inline-block;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }

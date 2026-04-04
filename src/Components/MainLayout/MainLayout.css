@@ -1,79 +1,249 @@
-/* ── Desktop layout ─────────────────────────────── */
+/* ── Google Font import ─────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Design tokens ──────────────────────────────── */
+:root {
+  --cream:        #eef2f7;
+  --cream-dark:   #dde4ee;
+  --sand:         #c2cede;
+  --terracotta:   #2e6da4;
+  --terra-light:  #4d8bbf;
+  --terra-pale:   #e8f0f9;
+  --ink:          #0f1f35;
+  --ink-mid:      #3a5068;
+  --ink-light:    #7a92a8;
+  --white:        #ffffff;
+  --gold:         #4a9eca;
+  --radius-card:  16px;
+  --shadow-soft:  0 1px 3px rgba(15,31,53,0.06), 0 4px 16px rgba(15,31,53,0.08);
+  --shadow-lift:  0 4px 12px rgba(15,31,53,0.1), 0 12px 32px rgba(15,31,53,0.12);
+}
+
+/* ── Base ───────────────────────────────────────── */
 .main-layout {
   display: flex;
   flex-direction: column;
   flex: 1;
   height: calc(100vh - 56px);
   overflow: hidden;
-  background: #0f0f0f;
+  background: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  position: relative;
 }
 
+/* Calm wave-inspired background pattern */
+.main-layout::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 28px,
+      rgba(46,109,164,0.035) 28px,
+      rgba(46,109,164,0.035) 29px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 28px,
+      rgba(46,109,164,0.035) 28px,
+      rgba(46,109,164,0.035) 29px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Mobile tabs ────────────────────────────────── */
 .main-layout__tabs {
-  display: none; /* hidden on desktop */
+  display: none;
 }
 
+/* ── Body ───────────────────────────────────────── */
 .main-layout__body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
-.main-layout__calendar {
+/* ── LEFT column ────────────────────────────────── */
+.main-layout__left {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding: 1.75rem 2rem 2.5rem;
+  box-sizing: border-box;
+  gap: 1.5rem;
+}
+
+/* ── Explainer cards ────────────────────────────── */
+.main-layout__explainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 740px;
+  flex-shrink: 0;
+}
+
+.explainer-card {
+  background: var(--white);
+  border: 1px solid rgba(46,109,164,0.12);
+  border-radius: var(--radius-card);
+  padding: 1.25rem 1.1rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.explainer-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2e6da4, #4a9eca);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.explainer-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
+.explainer-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Icon wrap ──────────────────────────────────── */
+.explainer-card__icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e8f0f9 0%, #d8eaf6 100%);
+  border: 1px solid rgba(46,109,164,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
-  padding: 2rem;
-  box-sizing: border-box;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(46,109,164,0.1);
 }
 
+/* ── Card body ──────────────────────────────────── */
+.explainer-card__body strong {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.explainer-card__body p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  line-height: 1.55;
+}
+
+/* ── Right column (planner) ─────────────────────── */
 .main-layout__planner {
   width: 360px;
   flex-shrink: 0;
   overflow-y: auto;
+  border-left: 1px solid var(--sand);
+  background: linear-gradient(160deg, #f4f8fd 0%, #eef2f7 100%);
+  box-shadow: -4px 0 20px rgba(15,31,53,0.06);
 }
 
+/* ── Scrollbars ─────────────────────────────────── */
+.main-layout__left::-webkit-scrollbar,
+.main-layout__planner::-webkit-scrollbar {
+  width: 4px;
+}
+.main-layout__left::-webkit-scrollbar-track,
+.main-layout__planner::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-layout__left::-webkit-scrollbar-thumb,
+.main-layout__planner::-webkit-scrollbar-thumb {
+  background: var(--sand);
+  border-radius: 4px;
+}
 
-/* ── Mobile layout (≤ 768px) ────────────────────── */
+/* ── Entrance animations ────────────────────────── */
+.explainer-card:nth-child(1) { animation: fadeUp 0.45s 0.05s ease both; }
+.explainer-card:nth-child(2) { animation: fadeUp 0.45s 0.12s ease both; }
+.explainer-card:nth-child(3) { animation: fadeUp 0.45s 0.19s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════
+   MOBILE  (≤ 768px)
+══════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* Tab bar */
+  .main-layout {
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
   .main-layout__tabs {
     display: flex;
     flex-shrink: 0;
-    border-bottom: 1px solid #222;
-    background: #141414;
+    background: var(--cream-dark);
+    border-bottom: 1px solid var(--sand);
+    padding: 0 0.5rem;
+    gap: 0.25rem;
+    position: relative;
+    z-index: 1;
   }
 
   .main-layout__tab {
     flex: 1;
-    padding: 0.75rem 1rem;
+    padding: 0.8rem 0.5rem;
     background: none;
     border: none;
-    color: #666;
+    border-bottom: 2px solid transparent;
+    color: var(--ink-light);
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s;
-    border-bottom: 2px solid transparent;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
   }
 
   .main-layout__tab--active {
-    color: #fff;
-    border-bottom-color: #fff;
+    color: var(--terracotta);
+    border-bottom-color: var(--terracotta);
+    font-weight: 600;
   }
 
-  /* Body becomes a single-column full-height area */
   .main-layout__body {
     flex: 1;
     overflow: hidden;
     position: relative;
   }
 
-  /* Both panels fill the body; only the active one is shown */
-  .main-layout__calendar,
+  .main-layout__left,
   .main-layout__planner {
     position: absolute;
     inset: 0;
@@ -83,6 +253,9 @@
     display: none;
     padding: 1rem;
     box-sizing: border-box;
+    border-left: none;
+    box-shadow: none;
+    background: var(--cream);
   }
 
   .main-layout__panel--active {
@@ -91,18 +264,59 @@
     align-items: center;
     justify-content: flex-start;
   }
+
+  .main-layout__left.main-layout__panel--active::before {
+    content: 'Optimisez vos congés ✦';
+    display: block;
+    width: 100%;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    text-align: center;
+    padding-top: 0.25rem;
+  }
+
+  .main-layout__explainer {
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+    max-width: 100%;
+  }
+
+  .explainer-card {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .explainer-card__body {
+    flex: 1;
+  }
+
+  .explainer-card::before {
+    height: 2px;
+  }
 }
 
-
-/* ── Small mobile (≤ 480px) ─────────────────────── */
+/* ══════════════════════════════════════════════════
+   SMALL MOBILE  (≤ 480px)
+══════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .main-layout__calendar,
+  .main-layout__left,
   .main-layout__planner {
     padding: 0.75rem;
   }
 
   .main-layout__tab {
     font-size: 0.8125rem;
-    padding: 0.65rem 0.5rem;
+    padding: 0.7rem 0.4rem;
+  }
+
+  .explainer-card__icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
 }

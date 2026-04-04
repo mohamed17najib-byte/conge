@@ -102,8 +102,11 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
     return normalize(date) < today;
   };
 
-  return (
-    <div className="calendar-shell">
+return (
+  <div className="calendar-shell">
+
+    <div className="calendar-shell__inner">
+
       <Calendar
         value={date}
         onChange={(val) => setDate(val as Date)}
@@ -122,31 +125,43 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
           ['D', 'L', 'M', 'M', 'J', 'V', 'S'][d.getDay()]
         }
         navigationLabel={({ date }) =>
-          date.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase()
+          date
+            .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+            .toUpperCase()
         }
       />
 
       {nextHoliday && (
-        <div className="next-holiday">
-          <div className="next-holiday__left">
-            <span className="next-holiday__label">Prochain jour férié</span>
-            <span className="next-holiday__name">{nextHoliday.name}</span>
-          </div>
-          <div className="next-holiday__right">
-            <span className="next-holiday__days">{daysUntil}</span>
-            <span className="next-holiday__unit">jours</span>
-          </div>
-        </div>
-      )}
-
-      {date && isHoliday(date) && normalize(date) >= today && (
-        <div className="holiday-banner">
-          <span className="holiday-icon">✦</span>
-          {getHolidayName(date)}
-        </div>
-      )}
+  <div className="next-holiday">
+    <span className="next-holiday__label">Prochain<br/>jour férié</span>
+    <div className="next-holiday__countdown">
+      <span className="next-holiday__days">{daysUntil}</span>
+      <span className="next-holiday__unit">jours</span>
     </div>
-  );
+    <div className="next-holiday__divider" />
+    <div className="next-holiday__info-group">
+      <span className="next-holiday__name">{nextHoliday.name}</span>
+      <span className="next-holiday__date">
+        {nextHoliday.dateObj.toLocaleDateString('fr-FR', {
+          day: 'numeric',
+          month: 'long',
+        })}
+      </span>
+    </div>
+  </div>
+)}
+
+    </div>
+
+    {date && isHoliday(date) && normalize(date) >= today && (
+      <div className="holiday-banner">
+        <span className="holiday-icon">✦</span>
+        {getHolidayName(date)}
+      </div>
+    )}
+
+  </div>
+);
 };
 
 export default HolidayCalendar;
