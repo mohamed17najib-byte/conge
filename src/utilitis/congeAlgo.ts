@@ -3,7 +3,6 @@ import { moroccoHolidays } from "../data/Holidays";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-// ✅ FIX 1: Use local date string to avoid UTC timezone shift
 const toLocalDateString = (d: Date): string => {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -22,6 +21,9 @@ const addDays = (d: Date, n: number): Date => {
   r.setDate(r.getDate() + n);
   return r;
 };
+
+const diffDays = (a: Date, b: Date): number =>
+  Math.round((b.getTime() - a.getTime()) / 86400000) + 1;
 
 export interface CongePeriod {
   start: Date;
@@ -47,42 +49,60 @@ const getFullBreakRange = (leaveStart: Date, leaveEnd: Date) => {
   return { s, e };
 };
 
-export const findBestPeriods = (nDays: number, targetMonth?: number): CongePeriod[] => {
+const touchesMonth = (s: Date, e: Date, month: number): boolean => {
+  const monthStart = new Date(2026, month, 1);
+  const monthEnd = new Date(2026, month + 1, 0);
+  return s <= monthEnd && e >= monthStart;
+};
+
+const isTooSimilar = (kept: CongePeriod, candidate: CongePeriod): boolean => {
+  const startGap = Math.abs(
+    Math.round((kept.start.getTime() - candidate.start.getTime()) / 86400000)
+  );
+
+  if (startGap >= 5) return false;
+
+  if (kept.totalDaysOff !== candidate.totalDaysOff) return false;
+  if (kept.efficiency !== candidate.efficiency) return false;
+
+  const kHolidays = kept.holidaysInPeriod.join(",");
+  const cHolidays = candidate.holidaysInPeriod.join(",");
+  if (kHolidays !== cHolidays) return false;
+
+  return true;
+};
+
+export const findBestPeriods = (
+  nDays: number,
+  targetMonth?: number
+): CongePeriod[] => {
   const results: CongePeriod[] = [];
   const seen = new Set<string>();
   const scanStart = today > BOUND_START ? today : BOUND_START;
 
+  const allWorkdays: Date[] = [];
   for (let d = new Date(scanStart); d <= BOUND_END; d = addDays(d, 1)) {
-    if (!isWorkday(d)) continue;
+    if (isWorkday(d)) allWorkdays.push(new Date(d));
+  }
 
-    const workdays: Date[] = [];
-    let cursor = new Date(d);
-
-    while (workdays.length < nDays && cursor <= BOUND_END) {
-      if (isWorkday(cursor)) workdays.push(new Date(cursor));
-      cursor = addDays(cursor, 1);
-    }
-
-    if (workdays.length < nDays) continue;
-
-    const leaveStart = workdays[0];
-    const leaveEnd = workdays[workdays.length - 1];
+  for (let i = 0; i <= allWorkdays.length - nDays; i++) {
+    const leaveStart = allWorkdays[i];
+    const leaveEnd = allWorkdays[i + nDays - 1];
 
     const { s, e } = getFullBreakRange(leaveStart, leaveEnd);
 
-    // ✅ FIX 2: Use local date string for the dedup key
+    // Dedup on full break range — this is what the user sees
     const key = `${toLocalDateString(s)}|${toLocalDateString(e)}`;
     if (seen.has(key)) continue;
     seen.add(key);
 
-    let totalDaysOff = 0;
+    if (targetMonth !== undefined && !touchesMonth(s, e, targetMonth)) continue;
+
+    const totalDaysOff = diffDays(s, e);
     const holidaysInPeriod: string[] = [];
     let temp = new Date(s);
-
     while (temp <= e) {
-      totalDaysOff++;
       if (isPublicHoliday(temp)) {
-        // ✅ FIX 3: Use local date string when storing holiday dates
         holidaysInPeriod.push(toLocalDateString(temp));
       }
       temp = addDays(temp, 1);
@@ -90,34 +110,30 @@ export const findBestPeriods = (nDays: number, targetMonth?: number): CongePerio
 
     const efficiency = totalDaysOff / nDays;
 
-    const touchesMonth =
-      targetMonth === undefined ||
-      (s.getMonth() <= targetMonth && e.getMonth() >= targetMonth) ||
-      s.getMonth() === targetMonth ||
-      e.getMonth() === targetMonth;
+    results.push({
+      start: s,    // full break start (includes weekend before)
+      end: e,      // full break end (includes weekend after)
+      congeUsed: nDays,
+      totalDaysOff,
+      holidaysInPeriod,
+      efficiency,
+    });
+  }
 
-    if (touchesMonth) {
-      results.push({
-        start: s,
-        end: e,
-        congeUsed: nDays,
-        totalDaysOff,
-        holidaysInPeriod,
-        efficiency,
-      });
+  results.sort((a, b) => {
+    if (b.efficiency !== a.efficiency) return b.efficiency - a.efficiency;
+    if (b.totalDaysOff !== a.totalDaysOff) return b.totalDaysOff - a.totalDaysOff;
+    return a.start.getTime() - b.start.getTime();
+  });
+
+  const selected: CongePeriod[] = [];
+  for (const period of results) {
+    const redundant = selected.some((kept) => isTooSimilar(kept, period));
+    if (!redundant) {
+      selected.push(period);
+      if (selected.length >= 10) break;
     }
   }
 
-  return results
-    .sort((a, b) => {
-      if (b.efficiency !== a.efficiency) return b.efficiency - a.efficiency;
-      if (b.totalDaysOff !== a.totalDaysOff) return b.totalDaysOff - a.totalDaysOff;
-      return a.start.getTime() - b.start.getTime();
-    })
-    .filter((p, i, self) =>
-      !self.slice(0, i).some(
-        (prev) => p.start <= prev.end && p.end >= prev.start
-      )
-    )
-    .slice(0, 5);
+  return selected;
 };
