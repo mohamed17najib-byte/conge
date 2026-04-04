@@ -1,0 +1,141 @@
+.conge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.conge-form__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: #f5f0e8;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.conge-form__desc {
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: #4a4a4a;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  margin: -0.8rem 0 0;
+}
+
+.conge-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.conge-form__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.conge-form__optional {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: #2e2e2e;
+  text-transform: uppercase;
+  border: 1px solid #2e2e2e;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.conge-form__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.conge-form__stepper {
+  width: 36px;
+  height: 36px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  color: #f5f0e8;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.conge-form__stepper:hover {
+  border-color: #d4a853;
+  color: #d4a853;
+}
+
+.conge-form__input {
+  flex: 1;
+  height: 36px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  color: #f5f0e8;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+
+.conge-form__input::-webkit-inner-spin-button,
+.conge-form__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.conge-form__input:focus {
+  border-color: #d4a853;
+}
+
+.conge-form__select {
+  height: 36px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  color: #f5f0e8;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 0 0.75rem;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.conge-form__select:focus {
+  border-color: #d4a853;
+}
+
+.conge-form__btn {
+  height: 42px;
+  background: #d4a853;
+  border: none;
+  border-radius: 8px;
+  color: #0f0f0f;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.conge-form__btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.conge-form__btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}

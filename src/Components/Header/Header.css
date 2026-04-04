@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap');
+
+.header {
+  font-family: 'DM Sans', sans-serif;
+  background: #0f0f0f;
+  border-bottom: 1px solid #1e1e1e;
+  width: 100%;
+  padding: 1.1rem 2rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.header__diamond {
+  font-size: 0.65rem;
+  color: #d4a853;
+}
+
+.header__name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: #f5f0e8;
+  letter-spacing: -0.01em;
+}
