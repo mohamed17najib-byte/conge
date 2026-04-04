@@ -1,4 +1,3 @@
-import React from 'react';
 import Header from './Components/Header/Header';
 import MainLayout from './Components/MainLayout/MainLayout';
 import './App.css';

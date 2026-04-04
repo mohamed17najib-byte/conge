@@ -86,7 +86,6 @@
   text-align: center;
   outline: none;
   transition: border-color 0.15s;
-  -moz-appearance: textfield;
 }
 
 .conge-form__input::-webkit-inner-spin-button,

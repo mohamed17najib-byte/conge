@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import './HolidayCalendar.css';
 import { moroccoHolidays } from '../../../data/Holidays';
@@ -74,7 +74,7 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
       return (
         <span
           className={`holiday-dot ${d < today ? 'holiday-dot--past' : ''}`}
-          title={getHolidayName(date)}
+          title={getHolidayName(date) as string}
         />
       );
     }

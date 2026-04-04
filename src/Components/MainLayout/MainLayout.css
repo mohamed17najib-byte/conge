@@ -1,9 +1,21 @@
+/* ── Desktop layout ─────────────────────────────── */
 .main-layout {
   display: flex;
+  flex-direction: column;
   flex: 1;
-  height: calc(100vh - 56px); /* subtract header height */
+  height: calc(100vh - 56px);
   overflow: hidden;
   background: #0f0f0f;
+}
+
+.main-layout__tabs {
+  display: none; /* hidden on desktop */
+}
+
+.main-layout__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
 .main-layout__calendar {
@@ -20,4 +32,77 @@
   width: 360px;
   flex-shrink: 0;
   overflow-y: auto;
+}
+
+
+/* ── Mobile layout (≤ 768px) ────────────────────── */
+@media (max-width: 768px) {
+
+  /* Tab bar */
+  .main-layout__tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 1px solid #222;
+    background: #141414;
+  }
+
+  .main-layout__tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    border-bottom: 2px solid transparent;
+    letter-spacing: 0.02em;
+  }
+
+  .main-layout__tab--active {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  /* Body becomes a single-column full-height area */
+  .main-layout__body {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Both panels fill the body; only the active one is shown */
+  .main-layout__calendar,
+  .main-layout__planner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    display: none;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .main-layout__panel--active {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+
+/* ── Small mobile (≤ 480px) ─────────────────────── */
+@media (max-width: 480px) {
+  .main-layout__calendar,
+  .main-layout__planner {
+    padding: 0.75rem;
+  }
+
+  .main-layout__tab {
+    font-size: 0.8125rem;
+    padding: 0.65rem 0.5rem;
+  }
 }

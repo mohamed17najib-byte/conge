@@ -1,4 +1,3 @@
-import React from 'react';
 import './CongeResult.css';
 import type { CongePeriod } from '../../../../utilitis/congeAlgo';
 
