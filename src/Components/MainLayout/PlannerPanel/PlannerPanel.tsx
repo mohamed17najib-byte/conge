@@ -13,12 +13,13 @@ export default function PlannerPanel({ onPeriodSelect }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hasResult, setHasResult] = useState(false);
 
-  const handleSubmit = (days: number, month?: number) => {
+  const handleSubmit = (days: number, month?: number, sixDayWeek?: boolean) => {
     setLoading(true);
     setSelectedIndex(null);
     onPeriodSelect(null);
     setTimeout(() => {
-      const results = findBestPeriods(days, month);
+      const results = findBestPeriods(days, month, sixDayWeek ?? false);
+
       setPeriods(results);
       setHasResult(true);
       setLoading(false);

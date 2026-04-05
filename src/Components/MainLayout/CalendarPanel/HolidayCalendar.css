@@ -118,13 +118,15 @@
 
 /* ── Day tiles ───────────────────────────────────────── */
 .react-calendar__month-view__days {
-  display: flex !important;
-  flex-wrap: wrap;
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4px;
 }
 
 .react-calendar__month-view__days > * {
-  flex-basis: calc(100% / 7) !important;
-  max-width: calc(100% / 7) !important;
+  max-width: none !important;
+  display: flex;
+  justify-content: center;
 }
 
 .react-calendar__tile {
@@ -134,8 +136,8 @@
   color: #3a5068;
   font-size: 0.8rem;
   font-weight: 300;
-  aspect-ratio: 1 / 1;
-  height: auto !important;
+  width: 44px;
+  height: 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -144,10 +146,8 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   padding: 0;
-  margin: 2px auto;
-  max-width: 44px;
+  margin: 0 auto;
 }
-
 .react-calendar__tile:hover:not(:disabled) {
   background: #dce8f4;
   color: #0f1f35;
@@ -550,4 +550,8 @@
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

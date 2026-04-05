@@ -129,6 +129,64 @@
   box-shadow: 0 0 0 3px rgba(46,109,164,0.12);
 }
 
+/* ── 6-day week toggle ─── */
+.conge-form__toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  padding: 0.7rem 0.85rem;
+  background: #e8f0f9;
+  border: 1px solid #c2cede;
+  border-radius: 10px;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.conge-form__toggle:hover {
+  border-color: #2e6da4;
+  background: #dfeaf5;
+}
+
+.conge-form__checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 2px solid #a0b8cc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  margin-top: 1px;
+}
+
+.conge-form__checkbox--checked {
+  background: linear-gradient(135deg, #2e6da4 0%, #4a9eca 100%);
+  border-color: #2e6da4;
+}
+
+.conge-form__toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.conge-form__toggle-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0f1f35;
+  letter-spacing: 0.01em;
+}
+
+.conge-form__toggle-hint {
+  font-size: 0.65rem;
+  font-weight: 300;
+  color: #7a92a8;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+}
+
 /* ── Submit button ─── */
 .conge-form__btn {
   height: 44px;

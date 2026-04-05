@@ -133,7 +133,7 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
   onActiveStartDateChange={({ activeStartDate }) => {
     if (activeStartDate) setActiveStartDate(activeStartDate);
   }}
-  showNeighboringMonth={false}
+  showNeighboringMonth={true}
   navigationLabel={({ date }) =>
     date
       .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
