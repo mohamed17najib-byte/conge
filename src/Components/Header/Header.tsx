@@ -11,7 +11,7 @@ export default function Header() {
           </svg>
         </div>
         <div className="header__text">
-          <span className="header__name">Maroc Fériés</span>
+          <span className="header__name">CongéPlus</span>
           <span className="header__tagline">Planificateur de congés</span>
         </div>
       </div>
