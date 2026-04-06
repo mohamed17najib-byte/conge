@@ -143,9 +143,8 @@ export const findBestPeriods = (
         }
       }
     }
-  if (actualCongeUsed > nDays) continue;
-    const efficiency = totalDaysOff / actualCongeUsed;
-    if (efficiency <= 1) continue;
+    const efficiency = totalDaysOff / Math.max(actualCongeUsed, 1);
+
 
     results.push({
       start: s,
