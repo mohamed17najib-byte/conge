@@ -97,7 +97,8 @@ const isTooSimilar = (kept: CongePeriod, candidate: CongePeriod): boolean => {
 export const findBestPeriods = (
   nDays: number,
   targetMonth?: number,
-  sixDayWeek = false
+  sixDayWeek = false,
+  
 ): CongePeriod[] => {
   const results: CongePeriod[] = [];
   const seen = new Set<string>();
@@ -110,9 +111,24 @@ export const findBestPeriods = (
     allWorkdays.push(new Date(d));
   }
 
-  for (let i = 0; i <= allWorkdays.length - nDays; i++) {
+ for (let i = 0; i < allWorkdays.length; i++) {
     const leaveStart = allWorkdays[i];
-    const leaveEnd = allWorkdays[i + nDays - 1];
+
+    // Place workdays one by one, counting Friday penalties against the budget
+    let cost = 0;
+    let j = i;
+    while (j < allWorkdays.length && cost < nDays) {
+      const d = allWorkdays[j];
+      const dayCost = (sixDayWeek && d.getDay() === 5 && !isPublicHoliday(d)) ? 2 : 1;
+      if (cost + dayCost > nDays) break; // would exceed budget
+      cost += dayCost;
+      j++;
+    }
+
+    // Not enough days to use the full budget — skip
+    if (cost < nDays) continue;
+
+    const leaveEnd = allWorkdays[j - 1];
 
     const { s, e } = getFullBreakRange(leaveStart, leaveEnd, sixDayWeek);
 
@@ -133,18 +149,9 @@ export const findBestPeriods = (
       temp = addDays(temp, 1);
     }
 
-    // 6-day week penalty: each Friday taken as congé also costs Saturday
-    // EXCEPT if Friday is a public holiday — then Saturday is free, no penalty
-    let actualCongeUsed = nDays;
-    if (sixDayWeek) {
-      for (let d = new Date(leaveStart); d <= leaveEnd; d = addDays(d, 1)) {
-        if (d.getDay() === 5 && !isPublicHoliday(d)) {
-          actualCongeUsed++; // Saturday penalty
-        }
-      }
-    }
-    const efficiency = totalDaysOff / Math.max(actualCongeUsed, 1);
+    const actualCongeUsed = nDays; // always exactly the budget
 
+    const efficiency = totalDaysOff / actualCongeUsed;
 
     results.push({
       start: s,
