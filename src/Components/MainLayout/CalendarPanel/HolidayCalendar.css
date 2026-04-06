@@ -555,3 +555,19 @@
   visibility: hidden !important;
   pointer-events: none !important;
 }
+/* ── Saturday penalty (6-day week) ───────────────────── */
+.react-calendar__tile.day--in-period.day--saturday-penalty {
+  background: #f0d6c0 !important;
+  color: #8b4513 !important;
+  font-weight: 500 !important;
+}
+
+.react-calendar__tile.day--in-period.day--saturday-penalty::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 2px dashed #c47a3a;
+  opacity: 0.7;
+  pointer-events: none;
+}

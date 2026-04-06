@@ -1,13 +1,15 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import './PlannerPanel.css';
 import CongeForm from './CongeForm/CongeForm';
 import CongeResult from './CongeResult/CongeResult';
 import { findBestPeriods, type CongePeriod } from '../../../utilitis/congeAlgo';
+
 interface Props {
   onPeriodSelect: (p: CongePeriod | null) => void;
+  onSixDayWeekChange: (value: boolean) => void;
 }
 
-export default function PlannerPanel({ onPeriodSelect }: Props) {
+export default function PlannerPanel({ onPeriodSelect, onSixDayWeekChange }: Props) {
   const [periods, setPeriods] = useState<CongePeriod[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -17,6 +19,7 @@ export default function PlannerPanel({ onPeriodSelect }: Props) {
     setLoading(true);
     setSelectedIndex(null);
     onPeriodSelect(null);
+    onSixDayWeekChange(sixDayWeek ?? false);
     setTimeout(() => {
       const results = findBestPeriods(days, month, sixDayWeek ?? false);
 

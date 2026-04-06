@@ -21,9 +21,10 @@ const getDaysUntil = (date: Date) =>
 
 interface Props {
   highlightPeriod?: CongePeriod | null;
+  sixDayWeek?: boolean;
 }
 
-const HolidayCalendar = ({ highlightPeriod }: Props) => {
+const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
   const [date, setDate] = useState<Date>(today);
   const [activeStartDate, setActiveStartDate] = useState<Date>(today);
 
@@ -41,6 +42,16 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
     const n = new Date(d);
     n.setHours(0, 0, 0, 0);
     return n;
+  };
+  const isSaturdayPenalty = (d: Date) => {
+    if (!highlightPeriod || !sixDayWeek) return false;
+    const t = normalize(d);
+    if (t.getDay() !== 6) return false; // not Saturday
+    if (!isInPeriod(t)) return false;
+    // Check if the Friday before is a leave day (workday in period, not a holiday)
+    const friday = new Date(t);
+    friday.setDate(friday.getDate() - 1);
+    return isLeaveDay(friday);
   };
 
   const isInPeriod = (d: Date) => {
@@ -92,7 +103,7 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
     return null;
   };
 
-  const tileClassNameExtended = ({ date, view }: { date: Date; view: string }) => {
+ const tileClassNameExtended = ({ date, view }: { date: Date; view: string }) => {
     const classes: string[] = [];
     const d = normalize(date);
 
@@ -102,6 +113,7 @@ const HolidayCalendar = ({ highlightPeriod }: Props) => {
     if (isPeriodEnd(date))       classes.push('day--period-end');
     if (isLeaveDay(date))        classes.push('day--leave-day');
     if (isWeekendInPeriod(date)) classes.push('day--weekend-in-period');
+    if (isSaturdayPenalty(date)) classes.push('day--saturday-penalty');  // ← here
     if (isHolidayInPeriod(date)) classes.push('day--holiday-in-period');
 
     const holidayClass = tileClassName({ date, view });
