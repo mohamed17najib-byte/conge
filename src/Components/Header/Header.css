@@ -193,4 +193,61 @@
     font-size: 0.72rem;
     padding: 0.28rem 0.75rem;
   }
+  
+}
+/* dans Header.css — ajoute juste ce bloc */
+
+.header__country {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(74, 158, 202, 0.18);
+  background: rgba(74, 158, 202, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(220, 235, 248, 0.7);
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.header__country:hover {
+  border-color: rgba(74, 158, 202, 0.32);
+  background: rgba(74, 158, 202, 0.1);
+}
+
+.header__country-flag {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* skeleton loader pendant le fetch */
+.header__country--loading {
+  width: 100px;
+  background: linear-gradient(
+    90deg,
+    rgba(74, 158, 202, 0.06) 25%,
+    rgba(74, 158, 202, 0.12) 50%,
+    rgba(74, 158, 202, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  color: transparent;
+  border-color: rgba(74, 158, 202, 0.1);
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 480px) {
+  .header__country {
+    font-size: 0.72rem;
+    padding: 0.28rem 0.75rem;
+  }
 }
