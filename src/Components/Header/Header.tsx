@@ -26,9 +26,16 @@ const [country, setCountry] = useState<{ name: string; code: string } | null>(nu
       </div>
 
       <nav className="header__actions">
-     {country && (
+    {country && (
   <span className="header__country">
-    {getFlagEmoji(country.code)} {country.name}
+    <img 
+      src={`https://flagcdn.com/24x18/${country.code.toLowerCase()}.png`}
+      alt={country.name}
+      width={24}
+      height={18}
+      style={{ borderRadius: '2px', objectFit: 'cover' }}
+    />
+    {country.name}
   </span>
 )}
         <div className="header__badge">
