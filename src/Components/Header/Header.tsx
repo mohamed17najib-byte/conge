@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import './Header.css';
 
 export default function Header() {
-  const [country, setCountry] = useState<string | null>(null);
+const [country, setCountry] = useState<{ name: string; code: string } | null>(null);
 
   useEffect(() => {
  fetch("/api/geo")
@@ -25,9 +25,11 @@ export default function Header() {
       </div>
 
       <nav className="header__actions">
-        {country && (
-          <span className="header__country">📍 {country}</span>
-        )}
+       {country && (
+  <span className="header__country">
+    📍 {country.name}
+  </span>
+)}
         <div className="header__badge">
           <span className="header__badge-dot" />
           2026
