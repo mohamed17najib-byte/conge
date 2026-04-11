@@ -234,3 +234,56 @@
   transform: none;
   box-shadow: none;
 }
+/* Weekend selector */
+.conge-form__weekend-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.conge-form__weekend-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #dce4ed;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.conge-form__weekend-option--active {
+  border-color: #2e6da4;
+  background: rgba(46, 109, 164, 0.04);
+}
+
+.conge-form__radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #b0bec5;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.15s ease;
+}
+
+.conge-form__radio--checked {
+  border-color: #2e6da4;
+}
+
+.conge-form__radio--checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2e6da4;
+}
+
+.conge-form__weekend-label {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.3;
+}

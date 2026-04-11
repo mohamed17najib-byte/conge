@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function CongeForm({ onSubmit, loading }: Props) {
-  const { lang } = useApp();
+  const { lang, weekendOptions, weekendDays, setWeekendDays } = useApp();
   const tr = t[lang as Lang] ?? t.fr;
 
   const [days, setDays] = useState<string>('');
@@ -26,6 +26,12 @@ export default function CongeForm({ onSubmit, loading }: Props) {
     const n = parseInt(days);
     if (!n || n < 1 || n > 30) return;
     onSubmit(n, month !== '' ? parseInt(month) : undefined, sixDayWeek);
+  };
+
+  const getOptionLabel = (opt: NonNullable<typeof weekendOptions>[number]) => {
+    if (lang === 'ar') return opt.labelAr;
+    if (lang === 'en') return opt.labelEn;
+    return opt.labelFr;
   };
 
   return (
@@ -72,6 +78,39 @@ export default function CongeForm({ onSubmit, loading }: Props) {
           ))}
         </select>
       </div>
+
+      {/* Weekend selector — only visible for countries with multiple options */}
+      {weekendOptions && (
+        <div className="conge-form__field">
+          <label className="conge-form__label">
+            {lang === 'ar' ? 'نظام عطلة نهاية الأسبوع' : lang === 'en' ? 'Weekend system' : 'Système de week-end'}
+          </label>
+          <div className="conge-form__weekend-options">
+            {weekendOptions.map((opt) => (
+              <label
+                key={opt.key}
+                className={`conge-form__weekend-option ${
+                  JSON.stringify(weekendDays) === JSON.stringify(opt.days)
+                    ? 'conge-form__weekend-option--active'
+                    : ''
+                }`}
+                onClick={() => setWeekendDays(opt.days)}
+              >
+                <span
+                  className={`conge-form__radio ${
+                    JSON.stringify(weekendDays) === JSON.stringify(opt.days)
+                      ? 'conge-form__radio--checked'
+                      : ''
+                  }`}
+                />
+                <span className="conge-form__weekend-label">
+                  {getOptionLabel(opt)}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="conge-form__field">
         <label

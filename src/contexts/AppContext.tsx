@@ -3,56 +3,133 @@ import type { Holiday } from '../types/Holiday';
 import { resolveHolidays } from '../data/Holidays';
 
 /**
- * Weekend fallback — JS day numbers: 0=Sun, 1=Mon … 5=Fri, 6=Sat
+ * ── Weekend configuration per country ─────────────────────────────────────
  *
- * Morocco: Saturday + Sunday off (NOT Friday)
- * Gulf states (SA, AE, etc.): Friday + Saturday off
- * Iran/Afghanistan: Friday only off
+ * JS day numbers: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+ *
+ * Some countries have different weekends depending on sector (public vs private).
+ * For those countries we store multiple options and let the user choose.
+ *
+ * Sources:
+ *  - timeanddate.com, flytrippers.com, hireborderless.com
  */
-const WEEKEND_FALLBACK: Record<string, number[]> = {
-  MA: [0, 6], DZ: [0, 5], TN: [0, 6], LY: [5, 6],
-  SA: [5, 6], AE: [5, 6], BH: [5, 6], KW: [5, 6], QA: [5, 6], OM: [5, 6],
-  IR: [5], AF: [5],
+
+export interface WeekendOption {
+  key: string;
+  labelFr: string;
+  labelEn: string;
+  labelAr: string;
+  days: number[];
+}
+
+export interface CountryWeekendConfig {
+  default: number[];
+  options?: WeekendOption[]; // if present → user can choose
+}
+
+const SAT_SUN: number[] = [0, 6];
+const FRI_SAT: number[] = [5, 6];
+const FRI_ONLY: number[] = [5];
+const THU_FRI: number[] = [4, 5];
+const FRI_SUN: number[] = [0, 5];
+
+const WEEKEND_CONFIG: Record<string, CountryWeekendConfig> = {
+  // ── Standard Saturday + Sunday (most countries) ─────────────────────────
+  MA: { default: SAT_SUN },
+  TN: { default: SAT_SUN },
+  TR: { default: SAT_SUN },
+  ID: { default: SAT_SUN },
+  MY: { default: SAT_SUN },
+
+  // ── Countries with sector-dependent weekends ────────────────────────────
+  SA: {
+    default: FRI_SAT,
+    options: [
+      {
+        key: 'fri_sat',
+        labelFr: 'Vendredi + Samedi (secteur privé)',
+        labelEn: 'Friday + Saturday (private sector)',
+        labelAr: 'الجمعة + السبت (القطاع الخاص)',
+        days: FRI_SAT,
+      },
+      {
+        key: 'sat_sun',
+        labelFr: 'Samedi + Dimanche (secteur public)',
+        labelEn: 'Saturday + Sunday (public sector)',
+        labelAr: 'السبت + الأحد (القطاع العام)',
+        days: SAT_SUN,
+      },
+    ],
+  },
+  AE: {
+    default: SAT_SUN,
+    options: [
+      {
+        key: 'sat_sun',
+        labelFr: 'Samedi + Dimanche (depuis 2022)',
+        labelEn: 'Saturday + Sunday (since 2022)',
+        labelAr: 'السبت + الأحد (منذ 2022)',
+        days: SAT_SUN,
+      },
+      {
+        key: 'fri_sat',
+        labelFr: 'Vendredi + Samedi (ancien / privé)',
+        labelEn: 'Friday + Saturday (legacy / private)',
+        labelAr: 'الجمعة + السبت (قديم / خاص)',
+        days: FRI_SAT,
+      },
+    ],
+  },
+
+  // ── Friday + Saturday ───────────────────────────────────────────────────
+  DZ: { default: FRI_SAT },
+  BH: { default: FRI_SAT },
+  BD: { default: FRI_SAT },
+  EG: { default: FRI_SAT },
+  IQ: { default: FRI_SAT },
+  IL: { default: FRI_SAT },
+  JO: { default: FRI_SAT },
+  KW: { default: FRI_SAT },
+  LY: { default: FRI_SAT },
+  MV: { default: FRI_SAT },
+  OM: { default: FRI_SAT },
+  PS: { default: FRI_SAT },
+  QA: { default: FRI_SAT },
+  SD: { default: FRI_SAT },
+  SY: { default: FRI_SAT },
+  YE: { default: FRI_SAT },
+
+  // ── Friday only ─────────────────────────────────────────────────────────
+  IR: { default: FRI_ONLY },
+  DJ: { default: FRI_ONLY },
+  SO: { default: FRI_ONLY },
+
+  // ── Thursday + Friday ───────────────────────────────────────────────────
+  AF: { default: THU_FRI },
+
+  // ── Friday + Sunday ─────────────────────────────────────────────────────
+  BN: { default: FRI_SUN },
 };
 
-async function fetchWeekendDays(countryCode: string): Promise<number[]> {
-  const code = countryCode.toUpperCase();
-
-  // If we have a known fallback for this country, trust it over the API
-  // (Nager.at sometimes returns incomplete data, e.g. only "Saturday" for Morocco)
-  if (WEEKEND_FALLBACK[code]) {
-    return WEEKEND_FALLBACK[code];
-  }
-
-  // For unknown countries, try the API
-  try {
-    const res = await fetch(`https://date.nager.at/api/v3/CountryInfo/${code}`);
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    const nameToDay: Record<string, number> = {
-      Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
-      Thursday: 4, Friday: 5, Saturday: 6,
-    };
-    if (data.weekendDays?.length) {
-      const days = data.weekendDays
-        .map((name: string) => nameToDay[name] ?? -1)
-        .filter((n: number) => n >= 0);
-      if (days.length > 0) return days;
-    }
-  } catch {}
-
-  // Ultimate fallback: Saturday + Sunday
-  return [0, 6];
+/**
+ * Get weekend config for a country.
+ */
+export function getWeekendConfig(countryCode: string): CountryWeekendConfig {
+  return WEEKEND_CONFIG[countryCode.toUpperCase()] ?? { default: SAT_SUN };
 }
+
+// ── Context ───────────────────────────────────────────────────────────────
 
 interface AppContextType {
   holidays: Holiday[];
   countryCode: string;
   lang: string;
   weekendDays: number[];
+  weekendOptions: WeekendOption[] | null; // null = no choice needed
   loadingCountry: boolean;
   setCountryCode: (code: string) => void;
   setLang: (lang: string) => void;
+  setWeekendDays: (days: number[]) => void;
 }
 
 const AppContext = createContext<AppContextType>({
@@ -60,9 +137,11 @@ const AppContext = createContext<AppContextType>({
   countryCode: 'MA',
   lang: 'fr',
   weekendDays: [0, 6],
+  weekendOptions: null,
   loadingCountry: false,
   setCountryCode: () => {},
   setLang: () => {},
+  setWeekendDays: () => {},
 });
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -70,6 +149,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState('fr');
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [weekendDays, setWeekendDays] = useState<number[]>([0, 6]);
+  const [weekendOptions, setWeekendOptions] = useState<WeekendOption[] | null>(null);
   const [loadingCountry, setLoadingCountry] = useState(true);
 
   useEffect(() => {
@@ -77,13 +157,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLoadingCountry(true);
     setHolidays([]);
 
-    Promise.all([
-      resolveHolidays(2026, countryCode, lang),
-      fetchWeekendDays(countryCode),
-    ]).then(([h, w]) => {
+    // Weekend days — synchronous from local map
+    const config = getWeekendConfig(countryCode);
+    setWeekendDays(config.default);
+    setWeekendOptions(config.options ?? null);
+
+    // Holidays — async from Calendarific + Nager
+    resolveHolidays(2026, countryCode, lang).then((h) => {
       if (!cancelled) {
         setHolidays(h);
-        setWeekendDays(w);
         setLoadingCountry(false);
       }
     });
@@ -92,7 +174,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [countryCode, lang]);
 
   return (
-    <AppContext.Provider value={{ holidays, countryCode, lang, weekendDays, loadingCountry, setCountryCode, setLang }}>
+    <AppContext.Provider
+      value={{
+        holidays,
+        countryCode,
+        lang,
+        weekendDays,
+        weekendOptions,
+        loadingCountry,
+        setCountryCode,
+        setLang,
+        setWeekendDays,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

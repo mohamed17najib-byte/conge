@@ -20,6 +20,23 @@ const LOCALE_MAP: Record<string, string> = {
   ar: 'ar-MA',
 };
 
+/**
+ * Find the first weekend day right after the last workday of the week.
+ * This is the day that gets "penalized" in 6-day week mode.
+ *
+ *   Morocco  [0, 6] → penalty weekend day = Saturday (6), triggered by Friday (5)
+ *   UAE      [5, 6] → penalty weekend day = Friday (5), triggered by Thursday (4)
+ */
+const findPenaltyWeekendDay = (weekendDays: number[]): number => {
+  const wSet = new Set(weekendDays);
+  for (let d = 0; d < 7; d++) {
+    if (wSet.has(d)) continue;
+    const next = (d + 1) % 7;
+    if (wSet.has(next)) return next; // first weekend day after the last workday
+  }
+  return 6; // fallback
+};
+
 interface Props {
   highlightPeriod?: CongePeriod | null;
   sixDayWeek?: boolean;
@@ -93,9 +110,10 @@ const HolidayCalendar = ({ highlightPeriod, sixDayWeek }: Props) => {
   const isSaturdayPenalty = (d: Date) => {
     if (!highlightPeriod || !sixDayWeek) return false;
     const t = normalize(d);
-    const penaltyDay = Math.max(...weekendDays);
-    if (t.getDay() !== penaltyDay) return false;
+    const penaltyWeekendDay = findPenaltyWeekendDay(weekendDays);
+    if (t.getDay() !== penaltyWeekendDay) return false;
     if (!isInPeriod(t)) return false;
+    // Check if the workday before this weekend day is a leave day
     const dayBefore = new Date(t);
     dayBefore.setDate(dayBefore.getDate() - 1);
     return isLeaveDay(dayBefore);
