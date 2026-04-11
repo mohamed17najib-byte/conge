@@ -5,9 +5,14 @@ export default function Header() {
   const [country, setCountry] = useState<string | null>(null);
 
   useEffect(() => {
-   fetch("/api/geo")
-      .then(r => r.json())
-      .then(d => setCountry(d.country_name));
+ fetch("/api/geo")
+  .then(r => r.json())
+  .then(d => {
+    if (d.country_code && d.country_name) {
+      setCountry({ name: d.country_name, code: d.country_code });
+    }
+  })
+  .catch(() => {});
   }, []);
 
   return (
