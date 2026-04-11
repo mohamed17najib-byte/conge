@@ -1,31 +1,39 @@
 <!doctype html>
-<html lang="fr" dir="ltr">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Primary SEO -->
-    <title>CongéPlus — Optimiseur de Congés Maroc 2026 | Jours Fériés & Ponts</title>
-    <meta name="description" content="Maximisez vos jours de repos au Maroc en 2026. CongéPlus trouve les meilleures périodes pour poser vos congés en exploitant les jours fériés et les week-ends." />
-    <meta name="keywords" content="congé Maroc 2026, jours fériés Maroc, optimiser vacances Maroc, pont Maroc 2026, calculateur congé, عطل المغرب" />
+    <!-- Primary SEO — English -->
+    <title>CongéPlus — Leave Optimizer 2026 | Public Holidays & Long Weekends</title>
+    <meta name="description" content="Maximize your days off in 2026. CongéPlus finds the best periods to take leave by leveraging public holidays and weekends in 30+ countries." />
+    <meta name="keywords" content="leave optimizer 2026, public holidays, long weekends, bridge days, day off planner, congé 2026, jours fériés, optimiser vacances, pont 2026, عطل, إجازات, تحسين الإجازات" />
     <meta name="author" content="CongéPlus" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://congeplus.ma/" />
+    <link rel="canonical" href="https://congeplus.com/" />
+
+    <!-- Hreflang for multi-language SEO -->
+    <link rel="alternate" hreflang="en" href="https://congeplus.com/?lang=en" />
+    <link rel="alternate" hreflang="fr" href="https://congeplus.com/?lang=fr" />
+    <link rel="alternate" hreflang="ar" href="https://congeplus.com/?lang=ar" />
+    <link rel="alternate" hreflang="x-default" href="https://congeplus.com/" />
 
     <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="CongéPlus — Optimiseur de Congés Maroc 2026" />
-    <meta property="og:description" content="Trouvez les meilleures périodes pour poser vos congés au Maroc. Exploitez les jours fériés et ponts pour maximiser vos jours off." />
-    <meta property="og:url" content="https://congeplus.ma/" />
-    <meta property="og:image" content="https://congeplus.ma/og-image.png" />
-    <meta property="og:locale" content="fr_MA" />
+    <meta property="og:title" content="CongéPlus — Leave Optimizer 2026 | Optimiseur de Congés | محسّن الإجازات" />
+    <meta property="og:description" content="Maximize your days off by leveraging public holidays and weekends in 30+ countries. Disponible en français, anglais et arabe." />
+    <meta property="og:url" content="https://congeplus.com/" />
+    <meta property="og:image" content="https://congeplus.com/og-image.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="ar_SA" />
     <meta property="og:site_name" content="CongéPlus" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CongéPlus — Optimiseur de Congés Maroc 2026" />
-    <meta name="twitter:description" content="Maximisez vos jours de repos grâce aux jours fériés marocains." />
-    <meta name="twitter:image" content="https://congeplus.ma/og-image.png" />
+    <meta name="twitter:title" content="CongéPlus — Leave Optimizer 2026" />
+    <meta name="twitter:description" content="Find the best time to take leave in 30+ countries. Available in English, French & Arabic." />
+    <meta name="twitter:image" content="https://congeplus.com/og-image.png" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -33,26 +41,33 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "CongéPlus",
-      "url": "https://congeplus.ma",
-      "description": "Optimiseur de congés pour le Maroc — trouvez les meilleures périodes en exploitant les jours fériés 2026.",
+      "url": "https://congeplus.com",
+      "description": "Leave optimizer — find the best periods to take time off by leveraging public holidays in 30+ countries.",
       "applicationCategory": "Productivity",
       "operatingSystem": "Web",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "MAD"
+        "priceCurrency": "USD"
       },
-      "inLanguage": ["fr", "ar"],
-      "countryOfOrigin": {
-        "@type": "Country",
-        "name": "Morocco"
-      }
+      "inLanguage": ["en", "fr", "ar"],
+      "availableLanguage": [
+        { "@type": "Language", "name": "English" },
+        { "@type": "Language", "name": "French" },
+        { "@type": "Language", "name": "Arabic" }
+      ]
     }
     </script>
 
-    <!-- Geo targeting -->
-    <meta name="geo.region" content="MA" />
-    <meta name="geo.placename" content="Morocco" />
+    <!-- Set lang & dir dynamically based on stored preference -->
+    <script>
+      (function() {
+        var lang = localStorage.getItem('congeplus-lang') || 'en';
+        var dir = lang === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.setAttribute('lang', lang);
+        document.documentElement.setAttribute('dir', dir);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
