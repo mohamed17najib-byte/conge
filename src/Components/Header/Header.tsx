@@ -5,7 +5,7 @@ export default function Header() {
   const [country, setCountry] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
+   fetch("/api/geo")
       .then(r => r.json())
       .then(d => setCountry(d.country_name));
   }, []);

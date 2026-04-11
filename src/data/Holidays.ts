@@ -36,7 +36,7 @@ async function fetchFromAPI(countryCode: string, year: number): Promise<Holiday[
 }
 
 async function detectCountryCode(): Promise<string> {
-  const res = await fetch("https://ipapi.co/json/");
+  const res = await fetch("/api/geo");
   const data = await res.json();
   return (data.country_code as string) ?? "MA";
 }
