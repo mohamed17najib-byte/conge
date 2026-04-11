@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Header.css';
+import { getFlagEmoji } from '../../utilitis/utilitis';
 
 export default function Header() {
 const [country, setCountry] = useState<{ name: string; code: string } | null>(null);
@@ -25,9 +26,9 @@ const [country, setCountry] = useState<{ name: string; code: string } | null>(nu
       </div>
 
       <nav className="header__actions">
-       {country && (
+     {country && (
   <span className="header__country">
-    📍 {country.name}
+    {getFlagEmoji(country.code)} {country.name}
   </span>
 )}
         <div className="header__badge">
