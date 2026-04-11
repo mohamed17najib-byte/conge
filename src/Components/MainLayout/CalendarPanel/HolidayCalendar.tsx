@@ -1,34 +1,44 @@
 import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import './HolidayCalendar.css';
-import { moroccoHolidays } from '../../../data/Holidays';
 import { isHoliday, tileClassName, getHolidayName } from '../../../utilitis/utilitis';
 import { isWeekend, isPublicHoliday } from '../../../utilitis/congeAlgo';
 import { type CongePeriod } from '../../../utilitis/congeAlgo';
+import { useApp } from '../../../contexts/AppContext';
+import { t } from '../../../i18n/translations';
+import type { Lang } from '../../../i18n/translations';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-const getNextHoliday = () => {
-  return moroccoHolidays
-    .map((h) => ({ ...h, dateObj: new Date(h.date) }))
-    .filter((h) => h.dateObj >= today)
-    .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime())[0];
-};
-
 const getDaysUntil = (date: Date) =>
   Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+const LOCALE_MAP: Record<string, string> = {
+  fr: 'fr-FR',
+  en: 'en-US',
+  ar: 'ar-MA',
+};
 
 interface Props {
   highlightPeriod?: CongePeriod | null;
   sixDayWeek?: boolean;
 }
 
-const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
+const HolidayCalendar = ({ highlightPeriod, sixDayWeek }: Props) => {
+  const { holidays, weekendDays, lang, loadingCountry } = useApp();
+  const tr = t[lang as Lang] ?? t.fr;
+
   const [date, setDate] = useState<Date>(today);
   const [activeStartDate, setActiveStartDate] = useState<Date>(today);
 
-  const nextHoliday = getNextHoliday();
+  const locale = LOCALE_MAP[lang] ?? 'fr-FR';
+
+  const nextHoliday = [...holidays]
+    .map((h) => ({ ...h, dateObj: new Date(h.date) }))
+    .filter((h) => h.dateObj >= today)
+    .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime())[0];
+
   const daysUntil = nextHoliday ? getDaysUntil(nextHoliday.dateObj) : null;
 
   useEffect(() => {
@@ -42,16 +52,6 @@ const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
     const n = new Date(d);
     n.setHours(0, 0, 0, 0);
     return n;
-  };
-  const isSaturdayPenalty = (d: Date) => {
-    if (!highlightPeriod || !sixDayWeek) return false;
-    const t = normalize(d);
-    if (t.getDay() !== 6) return false; // not Saturday
-    if (!isInPeriod(t)) return false;
-    // Check if the Friday before is a leave day (workday in period, not a holiday)
-    const friday = new Date(t);
-    friday.setDate(friday.getDate() - 1);
-    return isLeaveDay(friday);
   };
 
   const isInPeriod = (d: Date) => {
@@ -75,35 +75,46 @@ const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
   const isLeaveDay = (d: Date) => {
     if (!highlightPeriod) return false;
     const t = normalize(d);
-    return isInPeriod(t) && !isWeekend(t) && !isPublicHoliday(t);
+    return isInPeriod(t) && !isWeekend(t, weekendDays) && !isPublicHoliday(t, holidays);
   };
 
   const isWeekendInPeriod = (d: Date) => {
     if (!highlightPeriod) return false;
     const t = normalize(d);
-    return isInPeriod(t) && isWeekend(t);
+    return isInPeriod(t) && isWeekend(t, weekendDays);
   };
 
   const isHolidayInPeriod = (d: Date) => {
     if (!highlightPeriod) return false;
     const t = normalize(d);
-    return isInPeriod(t) && isPublicHoliday(t);
+    return isInPeriod(t) && isPublicHoliday(t, holidays);
+  };
+
+  const isSaturdayPenalty = (d: Date) => {
+    if (!highlightPeriod || !sixDayWeek) return false;
+    const t = normalize(d);
+    const penaltyDay = Math.max(...weekendDays);
+    if (t.getDay() !== penaltyDay) return false;
+    if (!isInPeriod(t)) return false;
+    const dayBefore = new Date(t);
+    dayBefore.setDate(dayBefore.getDate() - 1);
+    return isLeaveDay(dayBefore);
   };
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
-    if (view === 'month' && isHoliday(date)) {
+    if (view === 'month' && isHoliday(date, holidays)) {
       const d = normalize(date);
       return (
         <span
           className={`holiday-dot ${d < today ? 'holiday-dot--past' : ''}`}
-          title={getHolidayName(date) as string}
+          title={getHolidayName(date, holidays) as string}
         />
       );
     }
     return null;
   };
 
- const tileClassNameExtended = ({ date, view }: { date: Date; view: string }) => {
+  const tileClassNameExtended = ({ date, view }: { date: Date; view: string }) => {
     const classes: string[] = [];
     const d = normalize(date);
 
@@ -113,10 +124,10 @@ const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
     if (isPeriodEnd(date))       classes.push('day--period-end');
     if (isLeaveDay(date))        classes.push('day--leave-day');
     if (isWeekendInPeriod(date)) classes.push('day--weekend-in-period');
-    if (isSaturdayPenalty(date)) classes.push('day--saturday-penalty');  // ← here
+    if (isSaturdayPenalty(date)) classes.push('day--saturday-penalty');
     if (isHolidayInPeriod(date)) classes.push('day--holiday-in-period');
 
-    const holidayClass = tileClassName({ date, view });
+    const holidayClass = tileClassName({ date, view }, holidays);
     if (holidayClass) classes.push(holidayClass);
 
     return classes.join(' ') || null;
@@ -127,45 +138,57 @@ const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
     return normalize(date) < today;
   };
 
+  if (loadingCountry) return (
+    <div className="calendar-shell">
+      <div className="calendar-shell__loading">
+        <span className="calendar-shell__spinner" />
+      </div>
+    </div>
+  );
+
   return (
     <div className="calendar-shell">
       <div className="calendar-shell__inner">
-    <Calendar
-  value={date}
-  onChange={(val) => setDate(val as Date)}
-  tileClassName={tileClassNameExtended}
-  tileContent={tileContent}
-  tileDisabled={tileDisabled}
-  minDate={new Date(2026, 0, 1)}
-  maxDate={new Date(2026, 11, 31)}
-  minDetail="month"
-  locale="fr-FR"
-  calendarType="iso8601"
-  activeStartDate={activeStartDate}
-  onActiveStartDateChange={({ activeStartDate }) => {
-    if (activeStartDate) setActiveStartDate(activeStartDate);
-  }}
-  showNeighboringMonth={true}
-  navigationLabel={({ date }) =>
-    date
-      .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
-      .toUpperCase()
-  }
-/>
+        <Calendar
+          value={date}
+          onChange={(val) => setDate(val as Date)}
+          tileClassName={tileClassNameExtended}
+          tileContent={tileContent}
+          tileDisabled={tileDisabled}
+          minDate={new Date(2026, 0, 1)}
+          maxDate={new Date(2026, 11, 31)}
+          minDetail="month"
+          locale={locale}
+          calendarType="iso8601"
+          activeStartDate={activeStartDate}
+          onActiveStartDateChange={({ activeStartDate }) => {
+            if (activeStartDate) setActiveStartDate(activeStartDate);
+          }}
+          showNeighboringMonth={true}
+          navigationLabel={({ date }) =>
+            date
+              .toLocaleDateString(locale, { month: 'long', year: 'numeric' })
+              .toUpperCase()
+          }
+        />
 
         <div className="calendar-shell__side">
           {nextHoliday && (
             <div className="next-holiday">
-              <span className="next-holiday__label">Prochain<br />jour férié</span>
+              <span className="next-holiday__label">
+                {tr.nextHoliday.split('\n').map((line, i) => (
+                  <span key={i}>{line}{i === 0 && <br />}</span>
+                ))}
+              </span>
               <div className="next-holiday__countdown">
                 <span className="next-holiday__days">{daysUntil}</span>
-                <span className="next-holiday__unit">jours</span>
+                <span className="next-holiday__unit">{tr.days}</span>
               </div>
               <div className="next-holiday__divider" />
               <div className="next-holiday__info-group">
                 <span className="next-holiday__name">{nextHoliday.name}</span>
                 <span className="next-holiday__date">
-                  {nextHoliday.dateObj.toLocaleDateString('fr-FR', {
+                  {nextHoliday.dateObj.toLocaleDateString(locale, {
                     day: 'numeric',
                     month: 'long',
                   })}
@@ -174,12 +197,12 @@ const HolidayCalendar = ({ highlightPeriod,sixDayWeek }: Props) => {
             </div>
           )}
 
-          {date && isHoliday(date) && normalize(date) >= today && (
+          {date && isHoliday(date, holidays) && normalize(date) >= today && (
             <div className="holiday-banner">
               <span className="holiday-banner__dot" />
               <div className="holiday-banner__content">
-                <span className="holiday-banner__label">Jour férié sélectionné</span>
-                <span className="holiday-banner__name">{getHolidayName(date)}</span>
+                <span className="holiday-banner__label">{tr.selectedHoliday}</span>
+                <span className="holiday-banner__name">{getHolidayName(date, holidays)}</span>
               </div>
             </div>
           )}

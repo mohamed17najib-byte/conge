@@ -1,13 +1,8 @@
 import './CongeResult.css';
 import type { CongePeriod } from '../../../../utilitis/congeAlgo';
-
-const MONTHS_FR = [
-  'jan', 'fév', 'mar', 'avr', 'mai', 'jun',
-  'jul', 'aoû', 'sep', 'oct', 'nov', 'déc',
-];
-
-const formatDate = (d: Date) =>
-  `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+import { useApp } from '../../../../contexts/AppContext';
+import { t } from '../../../../i18n/translations';
+import type { Lang } from '../../../../i18n/translations';
 
 const MEDALS = ['✦', '◆', '◇'];
 
@@ -18,17 +13,23 @@ interface Props {
 }
 
 export default function CongeResult({ periods, onSelect, selectedIndex }: Props) {
+  const { lang } = useApp();
+  const tr = t[lang as Lang] ?? t.fr;
+
+  const formatDate = (d: Date) =>
+    `${d.getDate()} ${tr.months[d.getMonth()].slice(0, 3).toLowerCase()}`;
+
   if (periods.length === 0) {
     return (
       <div className="conge-result__empty">
-        Aucune période trouvée pour ce mois.
+        {tr.noPeriods}
       </div>
     );
   }
 
   return (
     <div className="conge-result">
-      <p className="conge-result__title">Meilleures périodes</p>
+      <p className="conge-result__title">{tr.bestPeriods}</p>
       {periods.map((p, i) => (
         <button
           key={i}
@@ -36,7 +37,7 @@ export default function CongeResult({ periods, onSelect, selectedIndex }: Props)
           onClick={() => onSelect(p)}
         >
           <div className="conge-result__card-top">
-            <span className="conge-result__medal">{MEDALS[i]}</span>
+            <span className="conge-result__medal">{MEDALS[i] ?? '·'}</span>
             <span className="conge-result__dates">
               {formatDate(p.start)} → {formatDate(p.end)}
             </span>
@@ -45,14 +46,14 @@ export default function CongeResult({ periods, onSelect, selectedIndex }: Props)
             </span>
           </div>
           <div className="conge-result__card-stats">
-            <span>{p.congeUsed}j posés</span>
+            <span>{p.congeUsed}{tr.daysUsed}</span>
             <span className="conge-result__dot-sep">·</span>
-            <span>{p.totalDaysOff}j de repos total</span>
+            <span>{p.totalDaysOff}{tr.totalRest}</span>
             {p.holidaysInPeriod.length > 0 && (
               <>
                 <span className="conge-result__dot-sep">·</span>
                 <span className="conge-result__holidays">
-                  {p.holidaysInPeriod.length} férié{p.holidaysInPeriod.length > 1 ? 's' : ''} inclus
+                  {p.holidaysInPeriod.length} {p.holidaysInPeriod.length > 1 ? tr.holidays : tr.holiday}
                 </span>
               </>
             )}

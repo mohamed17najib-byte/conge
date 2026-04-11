@@ -3,8 +3,14 @@ import './MainLayout.css';
 import HolidayCalendar from './CalendarPanel/HolidayCalendar';
 import PlannerPanel from './PlannerPanel/PlannerPanel';
 import { type CongePeriod } from '../../utilitis/congeAlgo';
+import { useApp } from '../../contexts/AppContext';
+import { t } from '../../i18n/translations';
+import type { Lang } from '../../i18n/translations';
 
 export default function MainLayout() {
+  const { lang } = useApp();
+  const tr = t[lang as Lang] ?? t.fr;
+
   const [selectedPeriod, setSelectedPeriod] = useState<CongePeriod | null>(null);
   const [sixDayWeek, setSixDayWeek] = useState(false);
   const [activeTab, setActiveTab] = useState<'calendar' | 'planner'>('calendar');
@@ -18,13 +24,13 @@ export default function MainLayout() {
           className={`main-layout__tab ${activeTab === 'calendar' ? 'main-layout__tab--active' : ''}`}
           onClick={() => setActiveTab('calendar')}
         >
-          Calendrier
+          {tr.calendar}
         </button>
         <button
           className={`main-layout__tab ${activeTab === 'planner' ? 'main-layout__tab--active' : ''}`}
           onClick={() => setActiveTab('planner')}
         >
-          Planifier
+          {tr.planner}
         </button>
       </div>
 
@@ -33,6 +39,7 @@ export default function MainLayout() {
         {/* LEFT: explainer + calendar */}
         <div className={`main-layout__left ${activeTab === 'calendar' ? 'main-layout__panel--active' : ''}`}>
           <div className="main-layout__explainer">
+
             <div className="explainer-card">
               <div className="explainer-card__icon-wrap">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,8 +54,8 @@ export default function MainLayout() {
                 </svg>
               </div>
               <div className="explainer-card__body">
-                <strong>Jours fériés marocains</strong>
-                <p>Tous les jours fériés officiels sont marqués pour vous aider à planifier au mieux.</p>
+                <strong>{tr.card1Title}</strong>
+                <p>{tr.card1Desc}</p>
               </div>
             </div>
 
@@ -63,8 +70,8 @@ export default function MainLayout() {
                 </svg>
               </div>
               <div className="explainer-card__body">
-                <strong>Posez moins, profitez plus</strong>
-                <p>Notre algorithme trouve les ponts idéaux pour maximiser vos vacances.</p>
+                <strong>{tr.card2Title}</strong>
+                <p>{tr.card2Desc}</p>
               </div>
             </div>
 
@@ -80,10 +87,11 @@ export default function MainLayout() {
                 </svg>
               </div>
               <div className="explainer-card__body">
-                <strong>Personnalisé pour vous</strong>
-                <p>Indiquez combien de jours vous avez et obtenez un plan sur mesure.</p>
+                <strong>{tr.card3Title}</strong>
+                <p>{tr.card3Desc}</p>
               </div>
             </div>
+
           </div>
 
           <HolidayCalendar highlightPeriod={selectedPeriod} sixDayWeek={sixDayWeek} />

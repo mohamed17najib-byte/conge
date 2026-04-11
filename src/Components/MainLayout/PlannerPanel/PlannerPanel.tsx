@@ -3,6 +3,9 @@ import './PlannerPanel.css';
 import CongeForm from './CongeForm/CongeForm';
 import CongeResult from './CongeResult/CongeResult';
 import { findBestPeriods, type CongePeriod } from '../../../utilitis/congeAlgo';
+import { useApp } from '../../../contexts/AppContext';
+import { t } from '../../../i18n/translations';
+import type { Lang } from '../../../i18n/translations';
 
 interface Props {
   onPeriodSelect: (p: CongePeriod | null) => void;
@@ -14,6 +17,8 @@ export default function PlannerPanel({ onPeriodSelect, onSixDayWeekChange }: Pro
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hasResult, setHasResult] = useState(false);
+  const { holidays, weekendDays, loadingCountry, lang } = useApp();
+  const tr = t[lang as Lang] ?? t.fr;
 
   const handleSubmit = (days: number, month?: number, sixDayWeek?: boolean) => {
     setLoading(true);
@@ -21,8 +26,7 @@ export default function PlannerPanel({ onPeriodSelect, onSixDayWeekChange }: Pro
     onPeriodSelect(null);
     onSixDayWeekChange(sixDayWeek ?? false);
     setTimeout(() => {
-      const results = findBestPeriods(days, month, sixDayWeek ?? false);
-
+      const results = findBestPeriods(days, holidays, weekendDays, month, sixDayWeek ?? false);
       setPeriods(results);
       setHasResult(true);
       setLoading(false);
@@ -40,7 +44,7 @@ export default function PlannerPanel({ onPeriodSelect, onSixDayWeekChange }: Pro
 
   return (
     <div className="planner-panel">
-      <CongeForm onSubmit={handleSubmit} loading={loading} />
+      <CongeForm onSubmit={handleSubmit} loading={loading || loadingCountry} />
 
       {hasResult && !loading && (
         <div className="planner-panel__divider" />
@@ -57,7 +61,7 @@ export default function PlannerPanel({ onPeriodSelect, onSixDayWeekChange }: Pro
       {loading && (
         <div className="planner-panel__loading">
           <span className="planner-panel__spinner">✦</span>
-          Calcul en cours...
+          {tr.calculating}
         </div>
       )}
     </div>

@@ -12,7 +12,7 @@
   flex-shrink: 0;
   background: linear-gradient(135deg, #070e1a 0%, #0c1a32 40%, #0f2040 100%);
   border-bottom: 1px solid rgba(74, 158, 202, 0.12);
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Ambient glow — top-left */
@@ -249,5 +249,90 @@
   .header__country {
     font-size: 0.72rem;
     padding: 0.28rem 0.75rem;
+  }
+}
+.header__dropdown {
+  position: relative;
+}
+
+.header__dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid rgba(74, 158, 202, 0.18);
+  background: rgba(74, 158, 202, 0.06);
+  backdrop-filter: blur(8px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(220, 235, 248, 0.85);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.header__dropdown-btn:hover {
+  border-color: rgba(74, 158, 202, 0.35);
+  background: rgba(74, 158, 202, 0.12);
+}
+
+.header__chevron {
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
+
+.header__dropdown-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #0c1a32;
+  border: 1px solid rgba(74, 158, 202, 0.2);
+  border-radius: 12px;
+  padding: 6px;
+  list-style: none;
+  margin: 0;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.header__dropdown-list::-webkit-scrollbar { width: 4px; }
+.header__dropdown-list::-webkit-scrollbar-thumb {
+  background: rgba(74, 158, 202, 0.3);
+  border-radius: 4px;
+}
+
+.header__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(220, 235, 248, 0.75);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.header__dropdown-item:hover {
+  background: rgba(74, 158, 202, 0.12);
+  color: rgba(220, 235, 248, 1);
+}
+
+.header__dropdown-item--active {
+  background: rgba(74, 158, 202, 0.18);
+  color: #4a9eca;
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .header__dropdown-btn {
+    font-size: 0.72rem;
+    padding: 0.28rem 0.6rem;
   }
 }

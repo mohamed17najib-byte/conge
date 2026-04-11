@@ -1,70 +1,140 @@
-// constants/moroccoHolidays.ts
 import type { Holiday } from "../types/Holiday";
 
-const moroccoHolidaysFallback: Holiday[] = [
-  // ── Fêtes Nationales ───────────────────────────────────────────
-  { date: "2026-01-01", name: "Jour de l'An" },                          // رأس السنة الميلادية
-  { date: "2026-01-11", name: "Manifeste de l'Indépendance" },           // ذكرى تقديم وثيقة الاستقلال
-  { date: "2026-01-14", name: "Nouvel An Amazigh (Yennayer)" },          // رأس السنة الأمازيغية
-  { date: "2026-05-01", name: "Fête du Travail" },                       // عيد الشغل
-  { date: "2026-07-30", name: "Fête du Trône" },                         // عيد العرش
-  { date: "2026-08-14", name: "Journée de Oued Ed-Dahab" },             // ذكرى استرجاع إقليم وادي الذهب
-  { date: "2026-08-20", name: "Révolution du Roi et du Peuple" },       // ذكرى ثورة الملك والشعب
-  { date: "2026-08-21", name: "Fête de la Jeunesse" },                   // عيد الشباب
-  { date: "2026-10-31", name: "Fête de l'Unité" },                       // عيد الوحدة
-  { date: "2026-11-06", name: "Marche Verte" },                          // ذكرى المسيرة الخضراء
-  { date: "2026-11-18", name: "Fête de l'Indépendance" },               // عيد الاستقلال
-  // ── Fêtes Islamiques ──────────────────────────────────────────
-  { date: "2026-03-20", name: "Aïd al-Fitr — 1er jour" },              // عيد الفطر
-  { date: "2026-03-21", name: "Aïd al-Fitr — 2ème jour" },             // عيد الفطر
-  { date: "2026-05-27", name: "Aïd al-Adha — 1er jour" },              // عيد الأضحى
-  { date: "2026-05-28", name: "Aïd al-Adha — 2ème jour" },             // عيد الأضحى
-  { date: "2026-06-16", name: "Nouvel An Hégirien (1er Mouharram 1448)" }, // رأس السنة الهجرية
-  { date: "2026-08-25", name: "Aïd al-Mawlid (Naissance du Prophète)" },  // عيد المولد النبوي الشريف
-];
+const CALENDARIFIC_KEY = import.meta.env.VITE_CALENDARIFIC_KEY as string;
 
-async function fetchFromAPI(countryCode: string, year: number): Promise<Holiday[]> {
-  const res = await fetch(
-    `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode.toUpperCase()}`
-  );
-  if (!res.ok) throw new Error(`No data for ${countryCode}`);
+// ── Language mapping ──────────────────────────────────────────────────────────
+const CALENDARIFIC_LANG: Record<string, string> = {
+  fr: 'fr',
+  en: 'en',
+  ar: 'ar',
+};
+
+
+const moroccoHolidaysFallback: Record<string, Holiday[]> = {
+  fr: [
+    { date: "2026-01-01", name: "Jour de l'An" },
+    { date: "2026-01-11", name: "Manifeste de l'Indépendance" },
+    { date: "2026-01-14", name: "Nouvel An Amazigh (Yennayer)" },
+    { date: "2026-05-01", name: "Fête du Travail" },
+    { date: "2026-07-30", name: "Fête du Trône" },
+    { date: "2026-08-14", name: "Journée de Oued Ed-Dahab" },
+    { date: "2026-08-20", name: "Révolution du Roi et du Peuple" },
+    { date: "2026-08-21", name: "Fête de la Jeunesse" },
+    { date: "2026-10-31", name: "Fête de l'Unité" },
+    { date: "2026-11-06", name: "Marche Verte" },
+    { date: "2026-11-18", name: "Fête de l'Indépendance" },
+    { date: "2026-03-20", name: "Aïd al-Fitr — 1er jour" },
+    { date: "2026-03-21", name: "Aïd al-Fitr — 2ème jour" },
+    { date: "2026-05-27", name: "Aïd al-Adha — 1er jour" },
+    { date: "2026-05-28", name: "Aïd al-Adha — 2ème jour" },
+    { date: "2026-06-16", name: "Nouvel An Hégirien (1er Mouharram 1448)" },
+    { date: "2026-08-25", name: "Aïd al-Mawlid (Naissance du Prophète)" },
+  ],
+  en: [
+    { date: "2026-01-01", name: "New Year's Day" },
+    { date: "2026-01-11", name: "Independence Manifesto Day" },
+    { date: "2026-01-14", name: "Amazigh New Year (Yennayer)" },
+    { date: "2026-05-01", name: "Labour Day" },
+    { date: "2026-07-30", name: "Throne Day" },
+    { date: "2026-08-14", name: "Oued Ed-Dahab Day" },
+    { date: "2026-08-20", name: "Revolution of the King and the People" },
+    { date: "2026-08-21", name: "Youth Day" },
+    { date: "2026-10-31", name: "Unity Day" },
+    { date: "2026-11-06", name: "Green March Day" },
+    { date: "2026-11-18", name: "Independence Day" },
+    { date: "2026-03-20", name: "Eid al-Fitr — 1st day" },
+    { date: "2026-03-21", name: "Eid al-Fitr — 2nd day" },
+    { date: "2026-05-27", name: "Eid al-Adha — 1st day" },
+    { date: "2026-05-28", name: "Eid al-Adha — 2nd day" },
+    { date: "2026-06-16", name: "Islamic New Year (1st Muharram 1448)" },
+    { date: "2026-08-25", name: "Prophet's Birthday (Mawlid)" },
+  ],
+  ar: [
+    { date: "2026-01-01", name: "رأس السنة الميلادية" },
+    { date: "2026-01-11", name: "ذكرى تقديم وثيقة الاستقلال" },
+    { date: "2026-01-14", name: "رأس السنة الأمازيغية (يناير)" },
+    { date: "2026-05-01", name: "عيد الشغل" },
+    { date: "2026-07-30", name: "عيد العرش" },
+    { date: "2026-08-14", name: "ذكرى استرجاع إقليم وادي الذهب" },
+    { date: "2026-08-20", name: "ذكرى ثورة الملك والشعب" },
+    { date: "2026-08-21", name: "عيد الشباب" },
+    { date: "2026-10-31", name: "عيد الوحدة" },
+    { date: "2026-11-06", name: "ذكرى المسيرة الخضراء" },
+    { date: "2026-11-18", name: "عيد الاستقلال" },
+    { date: "2026-03-20", name: "عيد الفطر — اليوم الأول" },
+    { date: "2026-03-21", name: "عيد الفطر — اليوم الثاني" },
+    { date: "2026-05-27", name: "عيد الأضحى — اليوم الأول" },
+    { date: "2026-05-28", name: "عيد الأضحى — اليوم الثاني" },
+    { date: "2026-06-16", name: "رأس السنة الهجرية (1 محرم 1448)" },
+    { date: "2026-08-25", name: "عيد المولد النبوي الشريف" },
+  ],
+};
+
+// ── In-memory cache ───────────────────────────────────────────────────────────
+const cache = new Map<string, Holiday[]>();
+
+// ── Source 1: Calendarific with language support ──────────────────────────────
+async function fetchFromCalendarific(countryCode: string, year: number, lang: string): Promise<Holiday[]> {
+  const language = CALENDARIFIC_LANG[lang] ?? 'en';
+  const url = `https://calendarific.com/api/v2/holidays?api_key=${CALENDARIFIC_KEY}&country=${countryCode.toUpperCase()}&year=${year}&type=national,religious,observance&language=${language}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Calendarific error: ${res.status}`);
   const data = await res.json();
-  return data.map((h: { date: string; localName: string; name: string }) => ({
-    date: h.date,
-    name: h.localName || h.name,
+  if (data.meta?.code !== 200) throw new Error(data.meta?.error_detail ?? 'Calendarific failed');
+  const holidays: { date: { iso: string }; name: string }[] = data.response?.holidays ?? [];
+  return holidays.map(h => ({
+    date: h.date.iso.slice(0, 10),
+    name: h.name,
   }));
 }
 
-async function detectCountryCode(): Promise<string> {
-  const res = await fetch("/api/geo");
-  const data = await res.json();
-  return (data.country_code as string) ?? "MA";
+// ── Source 2: Nager.at with locale support ────────────────────────────────────
+async function fetchFromNager(countryCode: string, year: number, lang: string): Promise<Holiday[]> {
+  const res = await fetch(
+    `https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode.toUpperCase()}`
+  );
+  if (!res.ok) throw new Error(`Nager error: ${res.status}`);
+  const data: { date: string; localName: string; name: string }[] = await res.json();
+  // Nager returns localName (local language) and name (English)
+  // Use localName for fr/ar, English name for en
+  return data.map(h => ({
+    date: h.date,
+    name: lang === 'en' ? h.name : (h.localName || h.name),
+  }));
 }
 
-async function resolveHolidays(year = 2026, forceCountry?: string): Promise<Holiday[]> {
-  try {
-    const countryCode = forceCountry?.toUpperCase() ?? await detectCountryCode();
-
-    if (countryCode === "MA") {
-      try {
-        const apiData = await fetchFromAPI("MA", year);
-        return apiData.length >= 15 ? apiData : moroccoHolidaysFallback;
-      } catch {
-        return moroccoHolidaysFallback;
-      }
+// ── Merge & deduplicate by date ───────────────────────────────────────────────
+function mergeHolidays(sources: Holiday[][]): Holiday[] {
+  const seen = new Map<string, Holiday>();
+  for (const list of sources) {
+    for (const h of list) {
+      if (!seen.has(h.date)) seen.set(h.date, h);
     }
-
-    return await fetchFromAPI(countryCode, year);
-  } catch {
-    return moroccoHolidaysFallback;
   }
+  return [...seen.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-// ── Export identique à ton fichier original ────────────────────────────────────
-// Démarre avec le fallback MA, se met à jour automatiquement via l'IP
-export let moroccoHolidays: Holiday[] = moroccoHolidaysFallback;
+// ── Main resolver with cache + language ──────────────────────────────────────
+export async function resolveHolidays(year = 2026, forceCountry = 'MA', lang = 'fr'): Promise<Holiday[]> {
+  const countryCode = forceCountry.toUpperCase();
+  const cacheKey = `${countryCode}-${year}-${lang}`; // ← lang is part of cache key
 
-// Lance le chargement immédiatement au import du fichier
-resolveHolidays().then((holidays) => {
-  moroccoHolidays = holidays;
-});
+  if (cache.has(cacheKey)) return cache.get(cacheKey)!;
+
+  const results = await Promise.allSettled([
+    fetchFromCalendarific(countryCode, year, lang),
+    fetchFromNager(countryCode, year, lang),
+  ]);
+
+  const successful = results
+    .filter((r): r is PromiseFulfilledResult<Holiday[]> => r.status === 'fulfilled')
+    .map(r => r.value)
+    .filter(list => list.length > 0);
+
+  const holidays = successful.length > 0
+    ? mergeHolidays(successful)
+    : (moroccoHolidaysFallback[lang] ?? moroccoHolidaysFallback.fr);
+
+  cache.set(cacheKey, holidays);
+  return holidays;
+}

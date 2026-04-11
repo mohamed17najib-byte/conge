@@ -1,14 +1,8 @@
 import { useState } from 'react';
 import './CongeForm.css';
-
-const MONTHS_FR = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
-];
-
-const currentMonth = new Date().getMonth();
-const futureMonths = MONTHS_FR.map((name, i) => ({ name, index: i }))
-  .filter((m) => m.index >= currentMonth);
+import { useApp } from '../../../../contexts/AppContext';
+import { t } from '../../../../i18n/translations';
+import type { Lang } from '../../../../i18n/translations';
 
 interface Props {
   onSubmit: (days: number, month?: number, sixDayWeek?: boolean) => void;
@@ -16,9 +10,17 @@ interface Props {
 }
 
 export default function CongeForm({ onSubmit, loading }: Props) {
+  const { lang } = useApp();
+  const tr = t[lang as Lang] ?? t.fr;
+
   const [days, setDays] = useState<string>('');
   const [month, setMonth] = useState<string>('');
   const [sixDayWeek, setSixDayWeek] = useState(false);
+
+  const currentMonth = new Date().getMonth();
+  const futureMonths = tr.months
+    .map((name, i) => ({ name, index: i }))
+    .filter((m) => m.index >= currentMonth);
 
   const handleSubmit = () => {
     const n = parseInt(days);
@@ -28,13 +30,11 @@ export default function CongeForm({ onSubmit, loading }: Props) {
 
   return (
     <div className="conge-form">
-      <p className="conge-form__title">Optimiser mes congés</p>
-      <p className="conge-form__desc">
-        Entrez vos jours disponibles et l'algorithme trouve les meilleures périodes.
-      </p>
+      <p className="conge-form__title">{tr.formTitle}</p>
+      <p className="conge-form__desc">{tr.formDesc}</p>
 
       <div className="conge-form__field">
-        <label className="conge-form__label">Jours de congé disponibles</label>
+        <label className="conge-form__label">{tr.daysLabel}</label>
         <div className="conge-form__row">
           <button
             className="conge-form__stepper"
@@ -58,22 +58,21 @@ export default function CongeForm({ onSubmit, loading }: Props) {
 
       <div className="conge-form__field">
         <label className="conge-form__label">
-          Mois souhaité
-          <span className="conge-form__optional">optionnel</span>
+          {tr.monthLabel}
+          <span className="conge-form__optional">{tr.monthOptional}</span>
         </label>
         <select
           className="conge-form__select"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
         >
-          <option value="">Meilleur mois automatique</option>
+          <option value="">{tr.monthAuto}</option>
           {futureMonths.map((m) => (
             <option key={m.index} value={m.index}>{m.name} 2026</option>
           ))}
         </select>
       </div>
 
-      {/* ── 6-day work week toggle ─── */}
       <div className="conge-form__field">
         <label
           className="conge-form__toggle"
@@ -87,10 +86,8 @@ export default function CongeForm({ onSubmit, loading }: Props) {
             )}
           </span>
           <span className="conge-form__toggle-text">
-            <span className="conge-form__toggle-title">Semaine de 6 jours</span>
-            <span className="conge-form__toggle-hint">
-              Samedi compté comme jour ouvrable (congé vendredi = samedi aussi déduit)
-            </span>
+            <span className="conge-form__toggle-title">{tr.sixDayTitle}</span>
+            <span className="conge-form__toggle-hint">{tr.sixDayHint}</span>
           </span>
         </label>
       </div>
@@ -100,7 +97,7 @@ export default function CongeForm({ onSubmit, loading }: Props) {
         onClick={handleSubmit}
         disabled={!days || loading}
       >
-        {loading ? 'Calcul...' : 'Trouver les meilleures périodes ✦'}
+        {loading ? tr.calculating : tr.submitBtn}
       </button>
     </div>
   );
