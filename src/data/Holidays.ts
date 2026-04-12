@@ -117,8 +117,12 @@ function mergeHolidays(sources: Holiday[][]): Holiday[] {
 // ── Main resolver with cache + language ──────────────────────────────────────
 export async function resolveHolidays(year = 2026, forceCountry = 'MA', lang = 'fr'): Promise<Holiday[]> {
   const countryCode = forceCountry.toUpperCase();
-  const cacheKey = `${countryCode}-${year}-${lang}`; // ← lang is part of cache key
 
+  if (countryCode === 'MA') {
+    return moroccoHolidaysFallback[lang] ?? moroccoHolidaysFallback.fr;
+  }
+
+  const cacheKey = `${countryCode}-${year}-${lang}`;
   if (cache.has(cacheKey)) return cache.get(cacheKey)!;
 
   const results = await Promise.allSettled([
@@ -131,9 +135,7 @@ export async function resolveHolidays(year = 2026, forceCountry = 'MA', lang = '
     .map(r => r.value)
     .filter(list => list.length > 0);
 
-  const holidays = successful.length > 0
-    ? mergeHolidays(successful)
-    : (moroccoHolidaysFallback[lang] ?? moroccoHolidaysFallback.fr);
+  const holidays = successful.length > 0 ? mergeHolidays(successful) : [];
 
   cache.set(cacheKey, holidays);
   return holidays;
